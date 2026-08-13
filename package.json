@@ -1,0 +1,13 @@
+{
+  "name": "pentest-evidence",
+  "version": "1.0.0",
+  "description": "渗透测试证据自动化插件: 复现模式自动生成 txt+真实Kali终端截图",
+  "main": "plugin/pentest-evidence.ts",
+  "scripts": {
+    "install:opencode": "copy plugin scripts command %USERPROFILE%\\.config\\opencode\\ && copy skills %USERPROFILE%\\.config\\opencode\\skills\\"
+  },
+  "keywords": ["opencode", "plugin", "pentest", "evidence", "repro"],
+  "dependencies": {
+    "@opencode-ai/plugin": "1.18.15"
+  }
+}
