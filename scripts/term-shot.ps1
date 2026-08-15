@@ -31,9 +31,11 @@ if (-not $distro) {
 $wslScript = Convert-WinToWslPath $Script
 $wslOut = Convert-WinToWslPath $OutFile
 $wslEngine = Convert-WinToWslPath $ENGINE
+$tok = [guid]::NewGuid().ToString('N').Substring(0, 8)
+$wslRepro = "/home/kali/edu/repro_$tok.sh"
 
-# 复现脚本复制到 kali 家目录(避免 /mnt/c 痕迹), 引擎同款处理
-& wsl.exe -d $distro bash -lc "mkdir -p /home/kali/edu && cp '$wslScript' /home/kali/edu/repro.sh && chmod +x /home/kali/edu/repro.sh && bash $wslEngine /home/kali/edu/repro.sh '$wslOut'"
+# 复现脚本复制到 kali 家目录(避免 /mnt/c 痕迹), 引擎同款处理; 文件名带随机 token 防并行冲突
+& wsl.exe -d $distro bash -lc "mkdir -p /home/kali/edu && cp '$wslScript' '$wslRepro' && chmod +x '$wslRepro' && bash '$wslEngine' '$wslRepro' '$wslOut'; rm -f '$wslRepro'"
 if ($LASTEXITCODE -ne 0) {
   Write-Output "TERM_SHOT_FAILED exit=$LASTEXITCODE"
   exit 1
