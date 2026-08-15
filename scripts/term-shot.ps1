@@ -34,7 +34,9 @@ $wslEngine = Convert-WinToWslPath $ENGINE
 $tok = [guid]::NewGuid().ToString('N').Substring(0, 8)
 $wslRepro = "/home/kali/edu/repro_$tok.sh"
 
-# 复现脚本复制到 kali 家目录(避免 /mnt/c 痕迹), 引擎同款处理; 文件名带随机 token 防并行冲突
+# NOTE: keep this file ASCII-only. PowerShell 5.1 parses BOM-less UTF-8 files as GBK,
+# and non-ASCII bytes can silently break script parsing (exit 0, no output, no PNG).
+# Copy repro script to kali home dir (avoid /mnt/c traces); unique name per render.
 & wsl.exe -d $distro bash -lc "mkdir -p /home/kali/edu && cp '$wslScript' '$wslRepro' && chmod +x '$wslRepro' && bash '$wslEngine' '$wslRepro' '$wslOut'; rm -f '$wslRepro'"
 if ($LASTEXITCODE -ne 0) {
   Write-Output "TERM_SHOT_FAILED exit=$LASTEXITCODE"
