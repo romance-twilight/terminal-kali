@@ -52,13 +52,14 @@ done
 sleep 1.5
 
 xwd -display ":$DISPNUM" -root -out "$XWD" 2>/dev/null
-# 裁剪到有效内容: 高度随内容自适应(上限1200, 容纳52行满窗), 宽度恢复全屏1440, 上下补回16px黑边距
+# 裁剪到有效内容: 高度随内容自适应(上限1200), 宽度恢复全屏1440, 顶部/底部各补回16px黑边距
+# (顶部必须补: 否则提示符1的框线贴图顶, 抗锯齿暗像素被 fuzz trim 吞掉)
 H=$(convert "$XWD" -fuzz 1% -trim +repage -format "%h" info: 2>/dev/null)
 [ -z "$H" ] && H=1200
 H=$((H + 32))
 [ "$H" -gt 1200 ] && H=1200
 [ "$H" -lt 120 ] && H=120
-convert "$XWD" -fuzz 1% -trim +repage -gravity northwest -background black -extent "1440x${H}" "$OUT" 2>/dev/null
+convert "$XWD" -fuzz 1% -trim +repage -gravity northwest -background black -splice 0x16 -extent "1440x${H}" "$OUT" 2>/dev/null
 echo "TERM_SHOT_OK $(stat -c%s "$OUT")"
 
 pkill -P $$ 2>/dev/null
