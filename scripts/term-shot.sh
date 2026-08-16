@@ -20,7 +20,7 @@ X_LOCK=/tmp/.X$DISPNUM-lock
 
 start_xvfb() {
   rm -f "$X_SOCK" "$X_LOCK"
-  Xvfb ":$DISPNUM" -screen 0 1440x900x24 -nolisten tcp >"$XVFB_LOG" 2>&1 &
+  Xvfb ":$DISPNUM" -screen 0 1440x1200x24 -nolisten tcp >"$XVFB_LOG" 2>&1 &
   XVFB_PID=$!
   for _ in $(seq 1 20); do
     xdpyinfo -display ":$DISPNUM" >/dev/null 2>&1 && return 0
@@ -52,11 +52,11 @@ done
 sleep 1.5
 
 xwd -display ":$DISPNUM" -root -out "$XWD" 2>/dev/null
-# 裁剪到有效内容: 高度随内容自适应(上限900), 宽度恢复全屏1440, 上下补回16px黑边距
+# 裁剪到有效内容: 高度随内容自适应(上限1200, 容纳52行满窗), 宽度恢复全屏1440, 上下补回16px黑边距
 H=$(convert "$XWD" -fuzz 1% -trim +repage -format "%h" info: 2>/dev/null)
-[ -z "$H" ] && H=900
+[ -z "$H" ] && H=1200
 H=$((H + 32))
-[ "$H" -gt 900 ] && H=900
+[ "$H" -gt 1200 ] && H=1200
 [ "$H" -lt 120 ] && H=120
 convert "$XWD" -fuzz 1% -trim +repage -gravity northwest -background black -extent "1440x${H}" "$OUT" 2>/dev/null
 echo "TERM_SHOT_OK $(stat -c%s "$OUT")"
